@@ -35,6 +35,7 @@ int main()
 			}
 		}
 	}
-	write_ppm("result.ppm", data, WIDTH, HEIGHT, 3);
+	//write_ppm("result.ppm", data, WIDTH, HEIGHT, 3);
+	gl_render(data, WIDTH, HEIGHT);
 	return 0;
 }
