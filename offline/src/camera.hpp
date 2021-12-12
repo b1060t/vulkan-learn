@@ -9,24 +9,17 @@ class Camera
 private:
 	vec3 _pos;
 public:
-	Camera(vec3 origin);
-	~Camera();
+	Camera(vec3 originPos)
+		:_pos(originPos)
+	{
 
-	vec3 Position();
+	}
+	~Camera(){}
+
+	vec3 Position()
+	{
+		return _pos;
+	}
 };
-
-Camera::Camera(vec3 originPos)
-	:_pos(originPos)
-{
-}
-
-Camera::~Camera()
-{
-}
-
-vec3 Camera::Position()
-{
-	return _pos;
-}
 
 #endif // !CAMERA

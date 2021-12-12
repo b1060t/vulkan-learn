@@ -54,7 +54,7 @@ void gl_render(
 {
 	tide::Context context("Result", width, height);
 	glfwSetInputMode(context.getWindow(), GLFW_STICKY_KEYS, GL_TRUE);
-	std::string vert = R"(#version 330 core
+	std::string vert = R"(#version 450 core
 					layout(location = 0) in vec2 vert_pos;
 					layout(location = 1) in vec2 tex_pos;
 
@@ -66,7 +66,7 @@ void gl_render(
 					    texPos = tex_pos;
 					})";
 
-	std::string frag = R"(#version 330 core
+	std::string frag = R"(#version 450 core
 
 					in vec2 texPos;
 
