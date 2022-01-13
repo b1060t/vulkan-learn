@@ -1,0 +1,6 @@
+add_requires("vulkan-hpp", "vulkan-loader", "glfw", "glm", "stb")
+target("vulkan-renderer")
+	set_kind("binary")
+	add_includedirs(".")
+	add_files("test.cpp")
+	add_packages("vulkan-hpp", "vulkan-loader", "glfw")
