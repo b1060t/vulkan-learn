@@ -6,6 +6,7 @@
 #include <vulkan/vulkan_raii.hpp>
 #include <constants.hpp>
 #include <optional>
+#include <set>
 
 struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
@@ -22,19 +23,24 @@ namespace tide
     class Device
     {
     public:
-        Device(vk::Instance instance)
+        vk::Queue graphicsQueue;
+        vk::Queue computeQueue;
+        vk::Queue presentQueue;
+        Device(vk::Instance instance, bool enableValidationLayers)
+            :_enableValidationLayers(enableValidationLayers)
         {
             _instance = instance;
         }
         ~Device()
         {
-
+            _device.destroy();
         }
     private:
         vk::PhysicalDevice _physicalDevice;
         vk::Device _device;
         vk::Instance _instance;
         vk::SurfaceKHR _surface;
+        bool _enableValidationLayers;
 
         bool isDeviceSuitable(vk::PhysicalDevice device)
         {
@@ -81,6 +87,41 @@ namespace tide
                 i++;
             }
             return indices;
+        }
+
+        void createLogicDevice()
+        {
+            QueueFamilyIndices indices = findQueueFamilies();
+            std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
+            std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.computeFamily.value(), indices.presentFamily.value()};
+            float queuePriority = 1.0f;
+            for (uint32_t queueFamily : uniqueQueueFamilies) {
+                vk::DeviceQueueCreateInfo queueCreateInfo{};
+                queueCreateInfo.sType = vk::StructureType::eDeviceQueueCreateInfo;
+                queueCreateInfo.queueFamilyIndex = queueFamily;
+                queueCreateInfo.queueCount = 1;
+                queueCreateInfo.pQueuePriorities = &queuePriority;
+                queueCreateInfos.push_back(queueCreateInfo);
+            }
+            vk::PhysicalDeviceFeatures deviceFeatures{};
+            deviceFeatures.samplerAnisotropy = VK_TRUE;
+            vk::DeviceCreateInfo createInfo{};
+            createInfo.sType = vk::StructureType::eDeviceCreateInfo;
+            createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+            createInfo.pQueueCreateInfos = queueCreateInfos.data();
+            createInfo.pEnabledFeatures = &deviceFeatures;
+            createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+            createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+            if (_enableValidationLayers) {
+                createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+                createInfo.ppEnabledLayerNames = validationLayers.data();
+            } else {
+                createInfo.enabledLayerCount = 0;
+            }
+            _device = _physicalDevice.createDevice(createInfo);
+            graphicsQueue = _device.getQueue(indices.graphicsFamily.value(), 0);
+            computeQueue = _device.getQueue(indices.computeFamily.value(), 0);
+            presentQueue = _device.getQueue(indices.presentFamily.value(), 0);
         }
     };
 }

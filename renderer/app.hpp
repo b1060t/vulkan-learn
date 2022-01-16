@@ -10,6 +10,7 @@
 #include <iostream>
 #include <layer.hpp>
 #include <device.hpp>
+#include <swapchain.hpp>
 #include <constants.hpp>
 
 #define WIDTH 800
